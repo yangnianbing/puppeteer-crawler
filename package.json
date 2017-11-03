@@ -1,0 +1,28 @@
+{
+  "name": "puppeteer-crawler",
+  "version": "1.0.0",
+  "description": "chrome headless puppeteer crawler",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yangnianbing/puppeteer-crawler.git"
+  },
+  "keywords": [
+    "puppeteer",
+    "crawler"
+  ],
+  "author": "yangnianbing@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yangnianbing/puppeteer-crawler/issues"
+  },
+  "homepage": "https://github.com/yangnianbing/puppeteer-crawler#readme",
+  "dependencies": {
+    "commander": "^2.11.0",
+    "inquirer": "^3.3.0",
+    "puppeteer": "^0.12.0"
+  }
+}
