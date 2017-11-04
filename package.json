@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/yangnianbing/puppeteer-crawler#readme",
   "dependencies": {
+    "chalk": "^2.3.0",
     "commander": "^2.11.0",
     "inquirer": "^3.3.0",
     "puppeteer": "^0.12.0"
