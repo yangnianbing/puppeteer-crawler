@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "chrome headless puppeteer crawler",
   "main": "index.js",
+  "bin": {
+    "puppeteer-crawler": "index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,7 +17,7 @@
     "puppeteer",
     "crawler"
   ],
-  "author": "yangnianbing@gmail.com",
+  "author": "137602812@qq.com",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/yangnianbing/puppeteer-crawler/issues"

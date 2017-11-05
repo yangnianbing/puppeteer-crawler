@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const path = require('path');
 const fs = require('fs');
 const puppeteer = require('puppeteer');
@@ -66,44 +68,41 @@ var command = program.command('start')
                         })
 
                         inquirer.prompt(promps).then(answers => {
-                            start(answers)
+                            start(Object.assign(option, answers))
                         })
                     })
 
-start({
-    url: 'http://www.baidu.com',
-    level: 0,
-    format: 'pdf',
-    target: process.cwd()
-})
+// start({
+//     url: 'http://www.baidu.com',
+//     level: 1,
+//     format: 'pdf',
+//     target: process.cwd()
+// })
 async function start(config){
     var {urls, browser} = await init(config);
     work(config, urls, browser);
 }
 
 
-const strRegex = "^((https|http|ftp|rtsp|mms)?://)"
-+ "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" //ftp的user@ 
- + "(([0-9]{1,3}\.){3}[0-9]{1,3}" // IP形式的URL- 199.194.52.184 
- + "|" // 允许IP和DOMAIN（域名）
- + "([0-9a-z_!~*'()-]+\.)*" // 域名- www. 
- + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\." // 二级域名 
- + "[a-z]{2,6})" // first level domain- .com or .museum 
- + "(:[0-9]{1,4})?" // 端口- :80 
- + "((/?)|" // a slash isn't required if there is no file name 
- + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$"; 
-const re=new RegExp(strRegex); 
 
 async function work(config, urls, browser){
-    while(true){
+    var flag = true;
+    while(flag){
         var urlObj = urls.shift();
-        if(!validate(urlObj)){
+
+        if(!urlObj){
+            flag = false;
+            browser.close();
+            continue;
+        }
+
+        if(urlObj.level > config.level){
             continue;
         }
 
         var page = await browser.newPage();
         try{
-            await page.goto(urlObj.url, {timeout: 3000});
+            await page.goto(urlObj.url, {timeout: 10000});
         }catch(e){
             outputErrorMsg(formatMsg(urlObj, '网络请求超时'));
             page.close();
@@ -116,7 +115,10 @@ async function work(config, urls, browser){
             })
             urlObj.filePath = path.join(urlObj.filePath, urlObj.name);
         }
-
+        createPath(urlObj.filePath);
+        var fullPath = path.join(urlObj.filePath, encodeFileName(urlObj.name)+'.pdf');
+        page.pdf({path:fullPath, format:'A4'});
+        outputMsg(formatMsg(urlObj, '生成文件:'+fullPath));
         var links = await page.evaluate(() => {
             return Array.from(document.querySelectorAll('a')).map(function($a){
                 return {
@@ -138,27 +140,31 @@ async function work(config, urls, browser){
         })
 
     }
+}
 
+function encodeFileName(str){
+    return str.replace(/[\\:*?/"<>|]/g, '_');
+}
 
-    function validate(urlObj, errorMsgHandler){
-        if(!re.test(urlObj.url)){
-            errorMsgHandler && errorMsgHandler(formatMsg(urlObj, '网址不合法')) || outputErrorMsg(formatMsg(urlObj, '网址不合法'));
-        }
-        return true;
-    }
+function validate(urlObj, errorMsgHandler){
+    return true;
 }
 
 function formatMsg(urlObj, msg){
-    return JSON.stringify({url: urlObj.url, errorMsg: msg});
+    return JSON.stringify({url: urlObj.url, msg: msg});
 }
 
 function outputErrorMsg(msg){
     console.log(chalk.red(msg));
 }
 
+function outputMsg(msg){
+    console.log(chalk.white(msg));
+}
+
 async function init(config){
     var browser = await puppeteer.launch({
-        headless: false
+        headless: true
     })
 
 
@@ -176,7 +182,7 @@ async function init(config){
     )}
 }
 
-//program.parse(process.argv);
+program.parse(process.argv);
 
 
 function createPath(filePath){
