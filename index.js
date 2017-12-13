@@ -35,6 +35,15 @@ var command = program.command('start')
                             })
                         }
 
+                        if(!option.query){
+                            promps.push({
+                                type: 'input',
+                                name: 'query',
+                                message: '请输入下钻元素选取器',
+                                default:'a'
+                            })
+                        }
+
                         if(!option.level){
                             promps.push({
                                 type: 'input',
@@ -72,12 +81,13 @@ var command = program.command('start')
                         })
                     })
 
-// start({
-//     url: 'http://www.baidu.com',
-//     level: 1,
-//     format: 'pdf',
-//     target: process.cwd()
-// })
+start({
+    url: 'https://reactjs.org/docs/hello-world.html',
+    level: 1,
+    format: 'pdf',
+    target: process.cwd(),
+    query: 'div.css-3ao3zf a'
+})
 async function start(config){
     var {urls, browser} = await init(config);
     work(config, urls, browser);
@@ -102,7 +112,7 @@ async function work(config, urls, browser){
 
         var page = await browser.newPage();
         try{
-            await page.goto(urlObj.url, {timeout: 10000});
+            await page.goto(urlObj.url, {timeout: 100000});
         }catch(e){
             outputErrorMsg(formatMsg(urlObj, '网络请求超时'));
             page.close();
@@ -119,14 +129,15 @@ async function work(config, urls, browser){
         var fullPath = path.join(urlObj.filePath, encodeFileName(urlObj.name)+'.pdf');
         page.pdf({path:fullPath, format:'A4'});
         outputMsg(formatMsg(urlObj, '生成文件:'+fullPath));
-        var links = await page.evaluate(() => {
-            return Array.from(document.querySelectorAll('a')).map(function($a){
+        var links = await page.evaluate((config) => {
+            console.log(config)
+            return Array.from(document.querySelectorAll(config.query)).map(function($a){
                 return {
                     url: $a.href.trim(),
                     name: $a.text
                 }
             })
-        });
+        }, config);
 
         page.close();
 
