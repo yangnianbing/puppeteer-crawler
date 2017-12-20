@@ -44,6 +44,14 @@ var command = program.command('start')
                             })
                         }
 
+                        if(!option.chrome){
+                            promps.push({
+                                type: 'input',
+                                name: 'chrome',
+                                message: '请输入chrome地址'
+                            })
+                        }
+
                         if(!option.level){
                             promps.push({
                                 type: 'input',
@@ -174,9 +182,13 @@ function outputMsg(msg){
 }
 
 async function init(config){
-    var browser = await puppeteer.launch({
+    var launchConfig = {
         headless: true
-    })
+    };
+    if(config.chrome){
+        launchConfig.executablePath = config.chrome;
+    }
+    var browser = await puppeteer.launch(launchConfig)
 
 
     var urls = config.url.split(path.delimiter);
