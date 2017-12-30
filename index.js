@@ -90,11 +90,12 @@ var command = program.command('start')
                     })
 
 start({
-    url: 'https://reactjs.org/docs/hello-world.html',
+    url: 'http://eggjs.org/zh-cn/tutorials/index.html',
     level: 1,
     format: 'pdf',
     target: process.cwd(),
-    query: 'div.css-3ao3zf a'
+    chrome: 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    query: '#mobileAside dl dd a'
 })
 async function start(config){
     var {urls, browser} = await init(config);
@@ -154,7 +155,7 @@ async function work(config, urls, browser){
                 url: link.url,
                 level: urlObj.level + 1,
                 name: link.name,
-                filePath: path.join(urlObj.filePath, link.name)
+                filePath: path.join(urlObj.filePath, encodeFileName(link.name))
             })
         })
 
@@ -162,7 +163,7 @@ async function work(config, urls, browser){
 }
 
 function encodeFileName(str){
-    return str.replace(/[\\:*?/"<>|]/g, '_');
+    return str.replace(/[\\:*?/"<>\.|]/g, '_');
 }
 
 function validate(urlObj, errorMsgHandler){
